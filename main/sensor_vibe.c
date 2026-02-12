@@ -8,8 +8,8 @@
 #define MPU6050_PWR_MGMT_1          0x6B
 #define MPU6050_ACCEL_XOUT_H        0x3B
 
-// FFT 参数：256点采样，500Hz采样率
-#define VIBE_FFT_SIZE 256
+// FFT 参数：128点采样，250Hz采样率
+#define VIBE_FFT_SIZE 128
 static float vibe_input[VIBE_FFT_SIZE * 2];
 static float vibe_window[VIBE_FFT_SIZE];
 
@@ -64,7 +64,7 @@ void vibe_get_data(float *out_amplitude, float *out_frequency) {
             temp_buffer[i] = accel_m;
             sum_accel += accel_m;
         }
-        esp_rom_delay_us(2000); // 500Hz 采样率
+        esp_rom_delay_us(1000); // 1000Hz 采样率
     }
 
     // 2. 动态去直流 (减去本次采样的平均值，只留震动部分)
