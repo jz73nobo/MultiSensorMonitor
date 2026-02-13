@@ -66,3 +66,24 @@ void sound_send_chunk(void)
                      (const char*)audio_buf,
                      samples * sizeof(int16_t));
 }
+
+int sound_read_sample(int16_t *out_sample)
+{
+    size_t bytes_read;
+
+    int32_t raw_sample;
+
+    i2s_read(I2S_PORT,
+             &raw_sample,
+             sizeof(raw_sample),
+             &bytes_read,
+             portMAX_DELAY);
+
+    if (bytes_read == sizeof(raw_sample))
+    {
+        *out_sample = (int16_t)(raw_sample >> 14);
+        return 1;
+    }
+
+    return 0;
+}

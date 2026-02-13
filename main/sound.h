@@ -5,5 +5,7 @@
 
 void sound_init(void);
 void sound_send_chunk(void);
+int sound_read_sample(int16_t *out_sample);
+
 
 #endif
