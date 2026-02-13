@@ -4,6 +4,7 @@
 #include "sensor_vibe.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "esp_timer.h"
 
 #define UART_PORT UART_NUM_0
 #define UART_BAUD 921600
@@ -24,15 +25,18 @@ void vibe_task(void *arg)
 
     while (1)
     {
+        int64_t timestamp = esp_timer_get_time();
+
         vibe_get_data(&amp, &freq);
 
-        char line[64];
+        char line[96];
         int len = snprintf(line, sizeof(line),
-                           "VIB,%.2f,%.2f\n", amp, freq);
+                           "VIB,%lld,%.2f,%.2f\n",
+                           timestamp, amp, freq);
 
         uart_write_bytes(UART_PORT, line, len);
 
-        vTaskDelay(pdMS_TO_TICKS(200));
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
 

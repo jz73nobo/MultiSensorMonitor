@@ -1,5 +1,6 @@
 #include "sound.h"
 #include "driver/uart.h"
+#include "esp_timer.h"
 #include <string.h>
 
 #define I2S_PORT I2S_NUM_0
@@ -49,8 +50,18 @@ void sound_send_chunk(void)
         audio_buf[i] = (int16_t)(i2s_buf[i] >> 14);
     }
 
+    int64_t timestamp = esp_timer_get_time();  // 微秒
+
+    // 发送头
     uint8_t header[4] = {'A','U','D','0'};
     uart_write_bytes(UART_PORT, (const char*)header, 4);
+
+    // 发送时间戳
+    uart_write_bytes(UART_PORT,
+                     (const char*)&timestamp,
+                     sizeof(int64_t));
+
+    // 发送音频数据
     uart_write_bytes(UART_PORT,
                      (const char*)audio_buf,
                      samples * sizeof(int16_t));

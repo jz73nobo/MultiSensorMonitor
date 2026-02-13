@@ -30,6 +30,10 @@ try:
 
         # ---------- 音频 ----------
         if header == b"AUD0":
+
+            ts_bytes = ser.read(8)
+            timestamp = struct.unpack('<q', ts_bytes)[0]
+
             data = ser.read(CHUNK_BYTES)
             if len(data) == CHUNK_BYTES:
                 samples = struct.unpack('<256h', data)
@@ -42,14 +46,16 @@ try:
 
             if line.startswith("VIB"):
                 parts = line.split(",")
-                if len(parts) == 3:
-                    amp = float(parts[1])
-                    freq = float(parts[2])
+                if len(parts) == 4:
+                    timestamp_us = int(parts[1])
+                    amp = float(parts[2])
+                    freq = float(parts[3])
 
-                    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+                    timestamp_str = datetime.fromtimestamp(timestamp_us/1e6)\
+                                    .strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
 
-                    csv_writer.writerow([timestamp, amp, freq])
-                    print(timestamp, amp, freq)
+                    csv_writer.writerow([timestamp_str, amp, freq])
+                    print(timestamp_str, amp, freq)
 
 except KeyboardInterrupt:
     print("Stopping...")
